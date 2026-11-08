@@ -114,14 +114,6 @@
                         <span class="text-slate-600">Product Base Price:</span>
                         <span id="resBaseOriginal" class="font-medium">19.99 USD</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-slate-600">Product Base (BDT):</span>
-                        <span id="resBaseBdt">2,398 BDT</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-slate-600">Service Margin (10%):</span>
-                        <span id="resMargin">239 BDT</span>
-                    </div>
                     <div class="pt-3 border-t border-slate-200 flex justify-between text-base font-bold text-pink-600">
                         <span>Estimated Total (Excl. Local Delivery):</span>
                         <span id="resTotal">3,100 BDT</span>
@@ -209,7 +201,6 @@
             const url = document.getElementById('urlInput').value.trim();
             if (!url) return alert('Please paste a product link first!');
 
-            // Accurate Link Platform Auto-Detection
             if (url.includes('global.oliveyoung')) {
                 document.getElementById('platformSelect').value = 'OLIVE_YOUNG_GLOBAL';
             } else if (url.includes('oliveyoung.co.kr') || url.includes('m.oliveyoung.co.kr')) {
@@ -239,7 +230,6 @@
                     }
 
                     if (data.title) {
-                        // Precise match for ml, g, gm, or L immediately following numbers
                         const match = data.title.match(/(\d+)\s*(ml|g|gm|L)\b/i);
                         if (match) {
                             let val = parseInt(match[1]);
@@ -296,8 +286,6 @@
 
             document.getElementById('resPlatform').innerText = platform.replace(/_/g, ' ');
             document.getElementById('resBaseOriginal').innerText = displayPriceStr;
-            document.getElementById('resBaseBdt').innerText = Math.ceil(baseBDT).toLocaleString() + ' BDT';
-            document.getElementById('resMargin').innerText = Math.ceil(marginBDT).toLocaleString() + ' BDT';
             document.getElementById('resTotal').innerText = totalBDT.toLocaleString() + ' BDT';
         }
 
