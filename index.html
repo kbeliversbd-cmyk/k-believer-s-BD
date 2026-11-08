@@ -194,10 +194,24 @@
                 const res = await fetch(`/api/scrape?url=${encodeURIComponent(url)}`);
                 const data = await res.json();
 
-                if (data.success && data.price) {
-                    document.getElementById('krwPriceInput').value = data.price;
+                if (data.success) {
+                    if (data.price) {
+                        document.getElementById('krwPriceInput').value = data.price;
+                    }
+
+                    // Automatically detect ml / g from the scraped title if available
+                    if (data.title) {
+                        const match = data.title.match(/(\d+)\s*(ml|g|gm|L)/i);
+                        if (match) {
+                            let val = parseInt(match[1]);
+                            const unit = match[2].toLowerCase();
+                            if (unit === 'l') val = val * 1000; // Convert Liters to mL
+                            document.getElementById('volumeInput').value = val;
+                        }
+                    }
+
                     calculatePrice();
-                    alert(`Auto-detected Price: ${data.price.toLocaleString()} KRW`);
+                    alert(`Auto-detected successfully! Price: ${data.price ? data.price.toLocaleString() + ' KRW' : 'Manual entry needed'}`);
                 } else {
                     alert('Price could not be fetched automatically. Please enter the KRW price manually.');
                 }
@@ -282,4 +296,3 @@
     </script>
 </body>
 </html>
-
