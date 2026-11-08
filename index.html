@@ -148,7 +148,16 @@
                             <input type="text" id="trxId" placeholder="e.g., 9N74ABC..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
                         </div>
                     </div>
-                    <button onclick="submitOrder()" class="w-full bg-pink-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-pink-700 transition">Confirm & Send Order via WhatsApp</button>
+                    
+                    <!-- Action Buttons -->
+                    <div class="space-y-2 pt-2">
+                        <button onclick="submitOrder()" class="w-full bg-green-600 text-white py-3 rounded-lg text-sm font-bold hover:bg-green-700 transition flex items-center justify-center gap-2">
+                            📱 1. Send Order via WhatsApp
+                        </button>
+                        <button onclick="copyOrderText()" class="w-full bg-slate-800 text-white py-2.5 rounded-lg text-xs font-medium hover:bg-slate-700 transition">
+                            📋 Or Copy Order Text (If WhatsApp doesn't open)
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -187,7 +196,7 @@
             const val = parseFloat(document.getElementById('volumeInput').value) || 300;
             const KRW_TO_BDT = parseFloat(document.getElementById('exchangeRateInput').value) || 0.090;
             
-            const AIR_FREIGHT_PER_KG_KRW = 17000; // Hidden calculation rate
+            const AIR_FREIGHT_PER_KG_KRW = 17000;
 
             let weightKg = 0.35;
             if (platform.includes('OLIVE_YOUNG')) {
@@ -198,7 +207,7 @@
 
             const baseBDT = krwPrice * KRW_TO_BDT;
             const freightBDT = (weightKg * AIR_FREIGHT_PER_KG_KRW) * KRW_TO_BDT;
-            const marginBDT = baseBDT * 0.10; // Hidden 10% margin calculation displayed cleanly
+            const marginBDT = baseBDT * 0.10;
             const totalBDT = Math.ceil(baseBDT + freightBDT + marginBDT);
 
             document.getElementById('resPlatform').innerText = platform.replace(/_/g, ' ');
@@ -208,7 +217,7 @@
             document.getElementById('resTotal').innerText = totalBDT.toLocaleString() + ' BDT';
         }
 
-        function submitOrder() {
+        function getOrderText() {
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
@@ -218,14 +227,41 @@
             const platform = document.getElementById('resPlatform').innerText;
             const link = document.getElementById('urlInput').value.trim();
 
+            return `*New Order - K-Believer's BD*\n\n*Customer Name:* ${name}\n*Phone:* ${phone}\n*Address:* ${address}\n\n*Platform:* ${platform}\n*Product Link:* ${link || 'Manual Entry'}\n*Estimated Total:* ${total}\n*Payment:* ${method}\n*TrxID:* ${trx}`;
+        }
+
+        function submitOrder() {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const trx = document.getElementById('trxId').value.trim();
+
             if (!name || !phone || !address || !trx) {
                 alert('Please fill in all order details and your Transaction ID.');
                 return;
             }
 
-            const message = `*New Order - K-Believer's BD*%0A%0A*Customer Name:* ${name}%0A*Phone:* ${phone}%0A*Address:* ${address}%0A%0A*Platform:* ${platform}%0A*Product Link:* ${link || 'Manual Entry'}%0A*Estimated Total:* ${total}%0A*Payment:* ${method}%0A*TrxID:* ${trx}`;
-            
-            window.open(`https://wa.me/message/4QK5LRQYL54RK1?text=${message}`, '_blank');
+            const text = encodeURIComponent(getOrderText());
+            window.open(`https://wa.me/message/4QK5LRQYL54RK1?text=${text}`, '_blank');
+        }
+
+        function copyOrderText() {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const trx = document.getElementById('trxId').value.trim();
+
+            if (!name || !phone || !address || !trx) {
+                alert('Please fill in all order details and your Transaction ID first.');
+                return;
+            }
+
+            const text = getOrderText();
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Order details copied! Now paste it into your WhatsApp chat with us.');
+            }).catch(err => {
+                alert('Could not copy text automatically. Please select and copy manually.');
+            });
         }
     </script>
 </body>
