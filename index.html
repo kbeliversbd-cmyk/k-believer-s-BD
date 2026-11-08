@@ -49,7 +49,7 @@
         <!-- Calculator Card -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
             <label class="block text-sm font-medium text-slate-700 mb-1">Paste Product Link</label>
-            <p class="text-xs text-slate-400 mb-2">If auto-fetch is blocked by the store, simply type the price manually below.</p>
+            <p class="text-xs text-slate-400 mb-2">Please check all fields. If incorrect, please type manually below.</p>
             <div class="flex gap-2 mb-4">
                 <input type="text" id="urlInput" placeholder="Paste product link here..." class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500">
                 <button onclick="processLink()" class="bg-pink-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-pink-700 transition">Auto-Detect</button>
@@ -62,8 +62,9 @@
                     <select id="platformSelect" onchange="togglePlatformFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
                         <option value="OLIVE_YOUNG_GLOBAL">Olive Young Global (USD $)</option>
                         <option value="OLIVE_YOUNG_KR">Olive Young KR (KRW ₩)</option>
-                        <option value="MUSINSA">Musinsa (Fashion - KRW ₩)</option>
-                        <option value="ZIGZAG">Zigzag (Fashion - KRW ₩)</option>
+                        <option value="MUSINSA_GLOBAL">Musinsa Global (USD $)</option>
+                        <option value="MUSINSA_KR">Musinsa KR (KRW ₩)</option>
+                        <option value="ZIGZAG">Zigzag (KRW ₩)</option>
                     </select>
                 </div>
 
@@ -73,7 +74,7 @@
                     <input type="number" id="krwPriceInput" value="25900" oninput="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold text-pink-600">
                 </div>
 
-                <!-- Price input for USD store (Olive Young Global) -->
+                <!-- Price input for USD stores -->
                 <div id="usdPriceContainer" class="hidden">
                     <label class="block text-xs font-medium text-slate-500 mb-1">Product Price (USD $)</label>
                     <input type="number" id="usdPriceInput" value="19.99" step="0.01" oninput="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold text-blue-600">
@@ -194,7 +195,7 @@
 
         function togglePlatformFields() {
             const platform = document.getElementById('platformSelect').value;
-            const isUsd = (platform === 'OLIVE_YOUNG_GLOBAL');
+            const isUsd = (platform === 'OLIVE_YOUNG_GLOBAL' || platform === 'MUSINSA_GLOBAL');
 
             document.getElementById('krwPriceContainer').classList.toggle('hidden', isUsd);
             document.getElementById('usdPriceContainer').classList.toggle('hidden', !isUsd);
@@ -208,13 +209,15 @@
             const url = document.getElementById('urlInput').value.trim();
             if (!url) return alert('Please paste a product link first!');
 
-            // Link-based platform auto-detection
+            // Accurate Link Platform Auto-Detection
             if (url.includes('global.oliveyoung')) {
                 document.getElementById('platformSelect').value = 'OLIVE_YOUNG_GLOBAL';
             } else if (url.includes('oliveyoung.co.kr') || url.includes('m.oliveyoung.co.kr')) {
                 document.getElementById('platformSelect').value = 'OLIVE_YOUNG_KR';
+            } else if (url.includes('global.musinsa.com')) {
+                document.getElementById('platformSelect').value = 'MUSINSA_GLOBAL';
             } else if (url.includes('musinsa.com')) {
-                document.getElementById('platformSelect').value = 'MUSINSA';
+                document.getElementById('platformSelect').value = 'MUSINSA_KR';
             } else if (url.includes('zigzag.kr') || url.includes('s.zigzag.kr')) {
                 document.getElementById('platformSelect').value = 'ZIGZAG';
             }
@@ -225,23 +228,42 @@
                 const res = await fetch(`/api/scrape?url=${encodeURIComponent(url)}`);
                 const data = await res.json();
 
-                if (data.success && data.price) {
-                    if (document.getElementById('platformSelect').value === 'OLIVE_YOUNG_GLOBAL') {
-                        document.getElementById('usdPriceInput').value = data.price;
-                    } else {
-                        document.getElementById('krwPriceInput').value = data.price;
+                if (data.success) {
+                    if (data.price) {
+                        const currentPlatform = document.getElementById('platformSelect').value;
+                        if (currentPlatform.includes('GLOBAL')) {
+                            document.getElementById('usdPriceInput').value = data.price;
+                        } else {
+                            document.getElementById('krwPriceInput').value = data.price;
+                        }
                     }
+
+                    if (data.title) {
+                        // Precise match for ml, g, gm, or L immediately following numbers
+                        const match = data.title.match(/(\d+)\s*(ml|g|gm|L)\b/i);
+                        if (match) {
+                            let val = parseInt(match[1]);
+                            const unit = match[2].toLowerCase();
+                            if (unit === 'l') val = val * 1000;
+                            document.getElementById('volumeInput').value = val;
+                        }
+                    }
+
+                    calculatePrice();
+                    alert(`Auto-detected successfully! Please check all fields. If incorrect, please type manually.`);
+                } else {
+                    alert('Please check all fields. If incorrect, please type manually.');
                 }
-                calculatePrice();
             } catch (err) {
                 calculatePrice();
+                alert('Please check all fields. If incorrect, please type manually.');
             }
         }
 
         function calculatePrice() {
             const platform = document.getElementById('platformSelect').value;
             const val = parseFloat(document.getElementById('volumeInput').value) || 100;
-            const isUsd = (platform === 'OLIVE_YOUNG_GLOBAL');
+            const isUsd = (platform === 'OLIVE_YOUNG_GLOBAL' || platform === 'MUSINSA_GLOBAL');
 
             let baseBDT = 0;
             let displayPriceStr = '';
