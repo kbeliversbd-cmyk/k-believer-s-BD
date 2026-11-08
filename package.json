@@ -1,1 +1,8 @@
+{
+  "name": "k-believers-bd-calculator",
+  "version": "1.0.0",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12"
+  }
+}
 
