@@ -1,8 +1,3 @@
-Here is your updated index.html code modified specifically to handle Olive Young Global (USD).
-What Changed in the System:
- * Added a dedicated Product Price (USD) input field that automatically appears whenever Olive Young Global is selected.
- * Included a USD Exchange Rate (USD to BDT) field (default set to 120 BDT/USD), alongside the existing KRW to BDT rate.
- * Automatically converts USD prices into BDT (plus weight air freight and margin) whenever Olive Young Global is chosen!
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -213,9 +208,10 @@ What Changed in the System:
             const url = document.getElementById('urlInput').value.trim();
             if (!url) return alert('Please paste a product link first!');
 
-            if (url.includes('global.oliveyoung.com')) {
+            // Link-based platform auto-detection
+            if (url.includes('global.oliveyoung')) {
                 document.getElementById('platformSelect').value = 'OLIVE_YOUNG_GLOBAL';
-            } else if (url.includes('oliveyoung.co.kr')) {
+            } else if (url.includes('oliveyoung.co.kr') || url.includes('m.oliveyoung.co.kr')) {
                 document.getElementById('platformSelect').value = 'OLIVE_YOUNG_KR';
             } else if (url.includes('musinsa.com')) {
                 document.getElementById('platformSelect').value = 'MUSINSA';
@@ -229,32 +225,16 @@ What Changed in the System:
                 const res = await fetch(`/api/scrape?url=${encodeURIComponent(url)}`);
                 const data = await res.json();
 
-                if (data.success) {
-                    if (data.price) {
-                        if (document.getElementById('platformSelect').value === 'OLIVE_YOUNG_GLOBAL') {
-                            document.getElementById('usdPriceInput').value = data.price;
-                        } else {
-                            document.getElementById('krwPriceInput').value = data.price;
-                        }
+                if (data.success && data.price) {
+                    if (document.getElementById('platformSelect').value === 'OLIVE_YOUNG_GLOBAL') {
+                        document.getElementById('usdPriceInput').value = data.price;
+                    } else {
+                        document.getElementById('krwPriceInput').value = data.price;
                     }
-
-                    if (data.title) {
-                        const match = data.title.match(/(\d+)\s*(ml|g|gm|L)/i);
-                        if (match) {
-                            let val = parseInt(match[1]);
-                            const unit = match[2].toLowerCase();
-                            if (unit === 'l') val = val * 1000;
-                            document.getElementById('volumeInput').value = val;
-                        }
-                    }
-
-                    calculatePrice();
-                    alert(`Auto-detected successfully! Price: ${data.price ? data.price : 'Manual entry needed'}`);
-                } else {
-                    alert('Price could not be fetched automatically. Please enter the price manually.');
                 }
+                calculatePrice();
             } catch (err) {
-                console.log('Scraper offline, using manual entry fallback.');
+                calculatePrice();
             }
         }
 
@@ -348,4 +328,3 @@ What Changed in the System:
     </script>
 </body>
 </html>
-
