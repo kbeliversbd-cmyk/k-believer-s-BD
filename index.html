@@ -1,3 +1,8 @@
+Here is your updated index.html code modified specifically to handle Olive Young Global (USD).
+What Changed in the System:
+ * Added a dedicated Product Price (USD) input field that automatically appears whenever Olive Young Global is selected.
+ * Included a USD Exchange Rate (USD to BDT) field (default set to 120 BDT/USD), alongside the existing KRW to BDT rate.
+ * Automatically converts USD prices into BDT (plus weight air freight and margin) whenever Olive Young Global is chosen!
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,7 +54,7 @@
         <!-- Calculator Card -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
             <label class="block text-sm font-medium text-slate-700 mb-1">Paste Product Link</label>
-            <p class="text-xs text-slate-400 mb-2">If the link does not auto-fetch, please type the product price and details manually below.</p>
+            <p class="text-xs text-slate-400 mb-2">If auto-fetch is blocked by the store, simply type the price manually below.</p>
             <div class="flex gap-2 mb-4">
                 <input type="text" id="urlInput" placeholder="Paste product link here..." class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500">
                 <button onclick="processLink()" class="bg-pink-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-pink-700 transition">Auto-Detect</button>
@@ -59,16 +64,24 @@
             <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                 <div>
                     <label class="block text-xs font-medium text-slate-500 mb-1">Store / Platform</label>
-                    <select id="platformSelect" onchange="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
-                        <option value="OLIVE_YOUNG_GLOBAL">Olive Young Global</option>
-                        <option value="OLIVE_YOUNG_KR">Olive Young KR</option>
-                        <option value="MUSINSA">Musinsa (Fashion)</option>
-                        <option value="ZIGZAG">Zigzag (Fashion)</option>
+                    <select id="platformSelect" onchange="togglePlatformFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                        <option value="OLIVE_YOUNG_GLOBAL">Olive Young Global (USD $)</option>
+                        <option value="OLIVE_YOUNG_KR">Olive Young KR (KRW ₩)</option>
+                        <option value="MUSINSA">Musinsa (Fashion - KRW ₩)</option>
+                        <option value="ZIGZAG">Zigzag (Fashion - KRW ₩)</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Product Price (KRW)</label>
+
+                <!-- Price input for KRW stores -->
+                <div id="krwPriceContainer">
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Product Price (KRW ₩)</label>
                     <input type="number" id="krwPriceInput" value="25900" oninput="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold text-pink-600">
+                </div>
+
+                <!-- Price input for USD store (Olive Young Global) -->
+                <div id="usdPriceContainer" class="hidden">
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Product Price (USD $)</label>
+                    <input type="number" id="usdPriceInput" value="19.99" step="0.01" oninput="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold text-blue-600">
                 </div>
             </div>
             
@@ -77,9 +90,17 @@
                     <label class="block text-xs font-medium text-slate-500 mb-1">Estimated Volume (mL) / Weight (g)</label>
                     <input type="number" id="volumeInput" value="100" oninput="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Everyday Exchange Rate (KRW to BDT)</label>
+
+                <!-- KRW Exchange Rate -->
+                <div id="krwRateContainer">
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Exchange Rate (KRW to BDT)</label>
                     <input type="number" id="exchangeRateInput" value="0.090" step="0.001" oninput="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-medium bg-slate-50">
+                </div>
+
+                <!-- USD Exchange Rate -->
+                <div id="usdRateContainer" class="hidden">
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Exchange Rate (USD to BDT)</label>
+                    <input type="number" id="usdExchangeRateInput" value="120.0" step="0.1" oninput="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-medium bg-slate-50">
                 </div>
             </div>
         </div>
@@ -94,16 +115,16 @@
                         <span id="resPlatform" class="font-medium">Olive Young Global</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-600">Product Base Price (KRW):</span>
-                        <span id="resBaseKrw">25,900 KRW</span>
+                        <span class="text-slate-600">Product Base Price:</span>
+                        <span id="resBaseOriginal" class="font-medium">19.99 USD</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-slate-600">Product Base (BDT):</span>
-                        <span id="resBaseBdt">2,331 BDT</span>
+                        <span id="resBaseBdt">2,398 BDT</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-600">Service Margin:</span>
-                        <span id="resMargin">233 BDT</span>
+                        <span class="text-slate-600">Service Margin (10%):</span>
+                        <span id="resMargin">239 BDT</span>
                     </div>
                     <div class="pt-3 border-t border-slate-200 flex justify-between text-base font-bold text-pink-600">
                         <span>Estimated Total (Excl. Local Delivery):</span>
@@ -173,8 +194,20 @@
 
     <script>
         window.onload = function() {
-            calculatePrice();
+            togglePlatformFields();
         };
+
+        function togglePlatformFields() {
+            const platform = document.getElementById('platformSelect').value;
+            const isUsd = (platform === 'OLIVE_YOUNG_GLOBAL');
+
+            document.getElementById('krwPriceContainer').classList.toggle('hidden', isUsd);
+            document.getElementById('usdPriceContainer').classList.toggle('hidden', !isUsd);
+            document.getElementById('krwRateContainer').classList.toggle('hidden', isUsd);
+            document.getElementById('usdRateContainer').classList.toggle('hidden', !isUsd);
+
+            calculatePrice();
+        }
 
         async function processLink() {
             const url = document.getElementById('urlInput').value.trim();
@@ -190,13 +223,19 @@
                 document.getElementById('platformSelect').value = 'ZIGZAG';
             }
 
+            togglePlatformFields();
+
             try {
                 const res = await fetch(`/api/scrape?url=${encodeURIComponent(url)}`);
                 const data = await res.json();
 
                 if (data.success) {
                     if (data.price) {
-                        document.getElementById('krwPriceInput').value = data.price;
+                        if (document.getElementById('platformSelect').value === 'OLIVE_YOUNG_GLOBAL') {
+                            document.getElementById('usdPriceInput').value = data.price;
+                        } else {
+                            document.getElementById('krwPriceInput').value = data.price;
+                        }
                     }
 
                     if (data.title) {
@@ -210,9 +249,9 @@
                     }
 
                     calculatePrice();
-                    alert(`Auto-detected successfully! Price: ${data.price ? data.price.toLocaleString() + ' KRW' : 'Manual entry needed'}`);
+                    alert(`Auto-detected successfully! Price: ${data.price ? data.price : 'Manual entry needed'}`);
                 } else {
-                    alert('Price could not be fetched automatically. Please enter the KRW price manually.');
+                    alert('Price could not be fetched automatically. Please enter the price manually.');
                 }
             } catch (err) {
                 console.log('Scraper offline, using manual entry fallback.');
@@ -221,10 +260,25 @@
 
         function calculatePrice() {
             const platform = document.getElementById('platformSelect').value;
-            const krwPrice = parseFloat(document.getElementById('krwPriceInput').value) || 0;
             const val = parseFloat(document.getElementById('volumeInput').value) || 100;
-            const KRW_TO_BDT = parseFloat(document.getElementById('exchangeRateInput').value) || 0.090;
-            
+            const isUsd = (platform === 'OLIVE_YOUNG_GLOBAL');
+
+            let baseBDT = 0;
+            let displayPriceStr = '';
+
+            if (isUsd) {
+                const usdPrice = parseFloat(document.getElementById('usdPriceInput').value) || 0;
+                const USD_TO_BDT = parseFloat(document.getElementById('usdExchangeRateInput').value) || 120.0;
+                baseBDT = usdPrice * USD_TO_BDT;
+                displayPriceStr = usdPrice.toFixed(2) + ' USD';
+            } else {
+                const krwPrice = parseFloat(document.getElementById('krwPriceInput').value) || 0;
+                const KRW_TO_BDT = parseFloat(document.getElementById('exchangeRateInput').value) || 0.090;
+                baseBDT = krwPrice * KRW_TO_BDT;
+                displayPriceStr = krwPrice.toLocaleString() + ' KRW';
+            }
+
+            const KRW_TO_BDT_RATE = parseFloat(document.getElementById('exchangeRateInput').value) || 0.090;
             const AIR_FREIGHT_PER_KG_KRW = 17000;
 
             let weightKg = 0.35;
@@ -234,13 +288,12 @@
                 weightKg = Math.max(0.35, val / 1000);
             }
 
-            const baseBDT = krwPrice * KRW_TO_BDT;
-            const freightBDT = (weightKg * AIR_FREIGHT_PER_KG_KRW) * KRW_TO_BDT;
+            const freightBDT = (weightKg * AIR_FREIGHT_PER_KG_KRW) * KRW_TO_BDT_RATE;
             const marginBDT = baseBDT * 0.10;
             const totalBDT = Math.ceil(baseBDT + freightBDT + marginBDT);
 
             document.getElementById('resPlatform').innerText = platform.replace(/_/g, ' ');
-            document.getElementById('resBaseKrw').innerText = krwPrice.toLocaleString() + ' KRW';
+            document.getElementById('resBaseOriginal').innerText = displayPriceStr;
             document.getElementById('resBaseBdt').innerText = Math.ceil(baseBDT).toLocaleString() + ' BDT';
             document.getElementById('resMargin').innerText = Math.ceil(marginBDT).toLocaleString() + ' BDT';
             document.getElementById('resTotal').innerText = totalBDT.toLocaleString() + ' BDT';
@@ -295,3 +348,4 @@
     </script>
 </body>
 </html>
+
