@@ -68,16 +68,15 @@
                     </select>
                 </div>
 
-                <!-- Price input for KRW stores -->
-                <div id="krwPriceContainer">
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Product Price (KRW ₩)</label>
-                    <input type="number" id="krwPriceInput" value="25900" oninput="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold text-pink-600">
-                </div>
-
-                <!-- Price input for USD stores -->
-                <div id="usdPriceContainer" class="hidden">
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Product Price (USD $)</label>
-                    <input type="number" id="usdPriceInput" value="19.99" step="0.01" oninput="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold text-blue-600">
+                <!-- Price input label and field container -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-500 mb-1" id="priceInputLabel">Product Price (USD $)</label>
+                    <div id="krwPriceContainer">
+                        <input type="number" id="krwPriceInput" value="25900" oninput="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold text-pink-600">
+                    </div>
+                    <div id="usdPriceContainer" class="hidden">
+                        <input type="number" id="usdPriceInput" value="19.99" step="0.01" oninput="calculatePrice()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold text-blue-600">
+                    </div>
                 </div>
             </div>
             
@@ -111,12 +110,20 @@
                         <span id="resPlatform" class="font-medium">Olive Young Global</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-600">Product Base Price:</span>
+                        <span class="text-slate-600" id="resBaseLabel">Product Base Price:</span>
                         <span id="resBaseOriginal" class="font-medium">19.99 USD</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Freight Charge:</span>
+                        <span id="resFreight">0 BDT</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Service Margin:</span>
+                        <span id="resMargin">0 BDT</span>
                     </div>
                     <div class="pt-3 border-t border-slate-200 flex justify-between text-base font-bold text-pink-600">
                         <span>Estimated Total (Excl. Local Delivery):</span>
-                        <span id="resTotal">3,100 BDT</span>
+                        <span id="resTotal">0 BDT</span>
                     </div>
                 </div>
             </div>
@@ -193,6 +200,9 @@
             document.getElementById('usdPriceContainer').classList.toggle('hidden', !isUsd);
             document.getElementById('krwRateContainer').classList.toggle('hidden', isUsd);
             document.getElementById('usdRateContainer').classList.toggle('hidden', !isUsd);
+
+            document.getElementById('priceInputLabel').innerText = isUsd ? 'Product Price (USD $)' : 'Product Price (KRW ₩)';
+            document.getElementById('resBaseLabel').innerText = isUsd ? 'Product Base Price (USD):' : 'Product Base Price (KRW):';
 
             calculatePrice();
         }
@@ -280,12 +290,14 @@
                 weightKg = Math.max(0.35, val / 1000);
             }
 
-            const freightBDT = (weightKg * AIR_FREIGHT_PER_KG_KRW) * KRW_TO_BDT_RATE;
-            const marginBDT = baseBDT * 0.10;
+            const freightBDT = Math.ceil((weightKg * AIR_FREIGHT_PER_KG_KRW) * KRW_TO_BDT_RATE);
+            const marginBDT = Math.ceil(baseBDT * 0.10);
             const totalBDT = Math.ceil(baseBDT + freightBDT + marginBDT);
 
             document.getElementById('resPlatform').innerText = platform.replace(/_/g, ' ');
             document.getElementById('resBaseOriginal').innerText = displayPriceStr;
+            document.getElementById('resFreight').innerText = freightBDT.toLocaleString() + ' BDT';
+            document.getElementById('resMargin').innerText = marginBDT.toLocaleString() + ' BDT';
             document.getElementById('resTotal').innerText = totalBDT.toLocaleString() + ' BDT';
         }
 
@@ -338,3 +350,4 @@
     </script>
 </body>
 </html>
+
