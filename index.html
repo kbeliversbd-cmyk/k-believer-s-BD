@@ -49,7 +49,7 @@
         <!-- Calculator Card -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
             <label class="block text-sm font-medium text-slate-700 mb-1">Paste Product Link</label>
-            <p class="text-xs text-slate-400 mb-2">If the link does not auto-fetch, please type the product price and details manually below.</p>
+            <p class="text-xs text-slate-400 mb-2">If auto-fetch is blocked by the store, simply type the price manually below.</p>
             <div class="flex gap-2 mb-4">
                 <input type="text" id="urlInput" placeholder="Paste product link here..." class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500">
                 <button onclick="processLink()" class="bg-pink-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-pink-700 transition">Auto-Detect</button>
@@ -167,7 +167,7 @@
             <p class="font-bold text-slate-700 mb-1">K-Believer's BD</p>
             <p>Address: Belabo, Narsingdi, Dhaka, Bangladesh</p>
             <p>Hotline BD: 01781571781, 01929063737</p>
-            <p>Korea WhatsApp: +82 010-9104-5103</p>
+            <p>Korea WhatsApp: +82 010-9703-7655</p>
         </footer>
     </div>
 
@@ -194,28 +194,14 @@
                 const res = await fetch(`/api/scrape?url=${encodeURIComponent(url)}`);
                 const data = await res.json();
 
-                if (data.success) {
-                    if (data.price) {
-                        document.getElementById('krwPriceInput').value = data.price;
-                    }
-
-                    if (data.title) {
-                        const match = data.title.match(/(\d+)\s*(ml|g|gm|L)/i);
-                        if (match) {
-                            let val = parseInt(match[1]);
-                            const unit = match[2].toLowerCase();
-                            if (unit === 'l') val = val * 1000;
-                            document.getElementById('volumeInput').value = val;
-                        }
-                    }
-
+                if (data.success && data.price) {
+                    document.getElementById('krwPriceInput').value = data.price;
                     calculatePrice();
-                    alert(`Auto-detected successfully! Price: ${data.price ? data.price.toLocaleString() + ' KRW' : 'Manual entry needed'}`);
                 } else {
-                    alert('Price could not be fetched automatically. Please enter the KRW price manually.');
+                    calculatePrice();
                 }
             } catch (err) {
-                console.log('Scraper offline, using manual entry fallback.');
+                calculatePrice();
             }
         }
 
