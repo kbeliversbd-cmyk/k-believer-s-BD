@@ -14,7 +14,7 @@
                 <img src="logo.png" alt="K-Believer's BD Logo" class="w-24 h-24 rounded-full object-cover border-2 border-pink-500 shadow-sm" onerror="this.style.display='none'">
             </div>
             <h1 class="text-3xl font-bold text-pink-600">K-Believer's BD</h1>
-            <p class="text-xs text-slate-500 italic mt-0.5">(Best Skin Care For You)</p>
+            <p class="text-xs text-slate-500 italic mt-0.5">(Best Skin Care & Fashion For You)</p>
             <p class="text-sm text-slate-600 mt-1">Direct from South Korea to Bangladesh 🇰🇷 ➡️ 🇧🇩</p>
             
             <!-- Store Image Badges -->
@@ -91,7 +91,7 @@
                 <div class="space-y-3 text-sm">
                     <div class="flex justify-between">
                         <span class="text-slate-600">Platform Source:</span>
-                        <span id="resPlatform" class="font-medium">Zigzag</span>
+                        <span id="resPlatform" class="font-medium">Olive Young Global</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-slate-600">Product Base Price (KRW):</span>
@@ -186,7 +186,7 @@
                 document.getElementById('platformSelect').value = 'OLIVE_YOUNG_KR';
             } else if (url.includes('musinsa.com')) {
                 document.getElementById('platformSelect').value = 'MUSINSA';
-            } else if (url.includes('zigzag.kr')) {
+            } else if (url.includes('zigzag.kr') || url.includes('s.zigzag.kr')) {
                 document.getElementById('platformSelect').value = 'ZIGZAG';
             }
 
@@ -199,13 +199,12 @@
                         document.getElementById('krwPriceInput').value = data.price;
                     }
 
-                    // Automatically detect ml / g from the scraped title if available
                     if (data.title) {
                         const match = data.title.match(/(\d+)\s*(ml|g|gm|L)/i);
                         if (match) {
                             let val = parseInt(match[1]);
                             const unit = match[2].toLowerCase();
-                            if (unit === 'l') val = val * 1000; // Convert Liters to mL
+                            if (unit === 'l') val = val * 1000;
                             document.getElementById('volumeInput').value = val;
                         }
                     }
@@ -223,7 +222,7 @@
         function calculatePrice() {
             const platform = document.getElementById('platformSelect').value;
             const krwPrice = parseFloat(document.getElementById('krwPriceInput').value) || 0;
-            const val = parseFloat(document.getElementById('volumeInput').value) || 300;
+            const val = parseFloat(document.getElementById('volumeInput').value) || 100;
             const KRW_TO_BDT = parseFloat(document.getElementById('exchangeRateInput').value) || 0.090;
             
             const AIR_FREIGHT_PER_KG_KRW = 17000;
