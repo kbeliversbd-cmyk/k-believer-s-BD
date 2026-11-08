@@ -1,1 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Believer's BD - Direct Korean Import Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+    <div class="max-w-3xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-pink-600">K-Believer's BD</h1>
+            <p class="text-sm text-slate-500 mt-1">Direct from Olive Young, Musinsa & Zigzag to Bangladesh</p>
+        </header>
 
+        <!-- Calculator Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
+            <label class="block text-sm font-medium text-slate-700 mb-2">Paste Product Link (Olive Young, Musinsa, Zigzag)</label>
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="urlInput" placeholder="https://global.oliveyoung.com/product/detail?prdtNo=..." class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500">
+                <button onclick="processLink()" class="bg-pink-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-pink-700 transition">Convert</button>
+            </div>
+
+            <!-- Manual Overrides (if scraping needs fallback) -->
+            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                <div>
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Store / Platform</label>
+                    <select id="platformSelect" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                        <option value="OLIVE_YOUNG_GLOBAL">Olive Young Global</option>
+                        <option value="OLIVE_YOUNG_KR">Olive Young KR</option>
+                        <option value="MUSINSA">Musinsa (Fashion)</option>
+                        <option value="ZIGZAG">Zigzag (Fashion)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Product Price (KRW)</label>
+                    <input type="number" id="krwPriceInput" value="39600" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                </div>
+            </div>
+            <div class="mt-4">
+                <label class="block text-xs font-medium text-slate-500 mb-1">Estimated Volume (mL for Cosmetics) or Weight (g for Fashion)</label>
+                <input type="number" id="volumeInput" value="150" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+            </div>
+            <button onclick="calculatePrice()" class="w-full mt-4 bg-slate-900 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 transition">Calculate BDT Price</button>
+        </div>
+
+        <!-- Result Box -->
+        <div id="resultBox" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hidden">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">Price Breakdown</h2>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Platform Source:</span>
+                    <span id="resPlatform" class="font-medium">Olive Young Global</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Product Base Price (KRW):</span>
+                    <span id="resBaseKrw">39,600 KRW</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Chargeable Weight:</span>
+                    <span id="resWeight">0.35 kg</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Product Base (BDT @ 0.09):</span>
+                    <span id="resBaseBdt">3,564 BDT</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Air Freight (17,000 KRW/kg):</span>
+                    <span id="resFreight">536 BDT</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Customs Duty (5%):</span>
+                    <span id="resCustoms">178 BDT</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Service Margin (10%):</span>
+                    <span id="resMargin">356 BDT</span>
+                </div>
+                <div class="pt-3 border-t border-slate-200 flex justify-between text-base font-bold text-pink-600">
+                    <span>Total Price for Customer:</span>
+                    <span id="resTotal">4,634 BDT</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function processLink() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) return;
+
+            if (url.includes('global.oliveyoung.com')) {
+                document.getElementById('platformSelect').value = 'OLIVE_YOUNG_GLOBAL';
+            } else if (url.includes('oliveyoung.co.kr')) {
+                document.getElementById('platformSelect').value = 'OLIVE_YOUNG_KR';
+            } else if (url.includes('musinsa.com')) {
+                document.getElementById('platformSelect').value = 'MUSINSA';
+            } else if (url.includes('zigzag.kr')) {
+                document.getElementById('platformSelect').value = 'ZIGZAG';
+            }
+            calculatePrice();
+        }
+
+        function calculatePrice() {
+            const platform = document.getElementById('platformSelect').value;
+            const krwPrice = parseFloat(document.getElementById('krwPriceInput').value) || 0;
+            const val = parseFloat(document.getElementById('volumeInput').value) || 300;
+            
+            const KRW_TO_BDT = 0.090;
+            const AIR_FREIGHT_PER_KG_KRW = 17000;
+
+            let weightKg = 0.35;
+            if (platform.includes('OLIVE_YOUNG')) {
+                weightKg = Math.max(0.35, (val * 1.15) / 1000);
+            } else {
+                weightKg = Math.max(0.35, val / 1000);
+            }
+
+            const baseBDT = krwPrice * KRW_TO_BDT;
+            const freightBDT = (weightKg * AIR_FREIGHT_PER_KG_KRW) * KRW_TO_BDT;
+            const customsBDT = baseBDT * 0.05;
+            const marginBDT = baseBDT * 0.10;
+            const totalBDT = Math.ceil(baseBDT + freightBDT + customsBDT + marginBDT);
+
+            document.getElementById('resPlatform').innerText = platform.replace(/_/g, ' ');
+            document.getElementById('resBaseKrw').innerText = krwPrice.toLocaleString() + ' KRW';
+            document.getElementById('resWeight').innerText = weightKg.toFixed(2) + ' kg';
+            document.getElementById('resBaseBdt').innerText = Math.ceil(baseBDT).toLocaleString() + ' BDT';
+            document.getElementById('resFreight').innerText = Math.ceil(freightBDT).toLocaleString() + ' BDT';
+            document.getElementById('resCustoms').innerText = Math.ceil(customsBDT).toLocaleString() + ' BDT';
+            document.getElementById('resMargin').innerText = Math.ceil(marginBDT).toLocaleString() + ' BDT';
+            document.getElementById('resTotal').innerText = totalBDT.toLocaleString() + ' BDT';
+
+            document.getElementById('resultBox').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
