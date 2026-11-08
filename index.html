@@ -3,16 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K-Believer's BD - Direct Korean Import Calculator</title>
+    <title>K-Believer's BD - Direct Korean Import Service</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
     <div class="max-w-3xl mx-auto px-4 py-8">
-        <!-- Header -->
+        <!-- Header with Official Logo -->
         <header class="text-center mb-8">
+            <div class="flex justify-center mb-3">
+                <img src="logo.png" alt="K-Believer's BD Logo" class="w-24 h-24 rounded-full object-cover border-2 border-pink-500 shadow-sm" onerror="this.style.display='none'">
+            </div>
             <h1 class="text-3xl font-bold text-pink-600">K-Believer's BD</h1>
-            <p class="text-sm text-slate-500 mt-1">Direct from South Korea to Bangladesh 🇰🇷 ➡️ 🇧🇩</p>
-            <p class="text-xs text-pink-500 font-medium mt-1">⚡ 50% Advance via bKash/Nagad required | Local delivery charge added upon arrival in BD</p>
+            <p class="text-xs text-slate-500 italic mt-0.5">(Best Skin Care For You)</p>
+            <p class="text-sm text-slate-600 mt-1">Direct from South Korea to Bangladesh 🇰🇷 ➡️ 🇧🇩</p>
+            
+            <!-- Store Image Badges -->
+            <div class="flex flex-wrap justify-center items-center gap-3 mt-4">
+                <div class="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-xs">
+                    <img src="oliveyoung.png" alt="Olive Young" class="w-5 h-5 rounded-full object-cover" onerror="this.style.display='none'">
+                    <span class="text-xs font-semibold text-slate-700">Olive Young</span>
+                </div>
+                <div class="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-xs">
+                    <img src="musinsa.png" alt="Musinsa" class="w-5 h-5 rounded-full object-cover" onerror="this.style.display='none'">
+                    <span class="text-xs font-semibold text-slate-700">Musinsa</span>
+                </div>
+                <div class="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-xs">
+                    <img src="zigzag.png" alt="Zigzag" class="w-5 h-5 rounded-full object-cover" onerror="this.style.display='none'">
+                    <span class="text-xs font-semibold text-slate-700">Zigzag</span>
+                </div>
+            </div>
+
+            <p class="text-xs text-pink-500 font-medium mt-3">⚡ 50% Advance via bKash/Nagad required | Local delivery added upon arrival</p>
+            
+            <!-- Quick Social Links -->
+            <div class="flex justify-center gap-3 mt-4">
+                <a href="https://www.facebook.com/share/19hWNvVvA3/?mibextid=wwXIfr" target="_blank" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700 transition flex items-center gap-1">
+                    Facebook Page
+                </a>
+                <a href="https://wa.me/message/4QK5LRQYL54RK1" target="_blank" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-700 transition flex items-center gap-1">
+                    WhatsApp Chat
+                </a>
+            </div>
         </header>
 
         <!-- Calculator Card -->
@@ -46,47 +77,90 @@
             <button onclick="calculatePrice()" class="w-full mt-4 bg-slate-900 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 transition">Calculate BDT Price</button>
         </div>
 
-        <!-- Result Box -->
-        <div id="resultBox" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hidden">
-            <h2 class="text-lg font-semibold text-slate-900 mb-4">Price Breakdown (South Korea to Bangladesh)</h2>
-            <div class="space-y-3 text-sm">
-                <div class="flex justify-between">
-                    <span class="text-slate-600">Platform Source:</span>
-                    <span id="resPlatform" class="font-medium">Olive Young Global</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-slate-600">Product Base Price (KRW):</span>
-                    <span id="resBaseKrw">39,600 KRW</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-slate-600">Chargeable Weight:</span>
-                    <span id="resWeight">0.35 kg</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-slate-600">Product Base (BDT @ 0.09):</span>
-                    <span id="resBaseBdt">3,564 BDT</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-slate-600">Air Freight (17,000 KRW/kg):</span>
-                    <span id="resFreight">536 BDT</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-slate-600">Service Margin (10%):</span>
-                    <span id="resMargin">356 BDT</span>
-                </div>
-                <div class="pt-3 border-t border-slate-200 flex justify-between text-base font-bold text-pink-600">
-                    <span>Estimated Total (Excl. Local Delivery):</span>
-                    <span id="resTotal">4,456 BDT</span>
+        <!-- Result Box & Order Form -->
+        <div id="resultBox" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hidden space-y-6">
+            <div>
+                <h2 class="text-lg font-semibold text-slate-900 mb-4">Price Breakdown (South Korea to Bangladesh)</h2>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Platform Source:</span>
+                        <span id="resPlatform" class="font-medium">Olive Young Global</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Product Base Price (KRW):</span>
+                        <span id="resBaseKrw">39,600 KRW</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Chargeable Weight:</span>
+                        <span id="resWeight">0.35 kg</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Product Base (BDT @ 0.09):</span>
+                        <span id="resBaseBdt">3,564 BDT</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Air Freight (17,000 KRW/kg):</span>
+                        <span id="resFreight">536 BDT</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Service Margin (10%):</span>
+                        <span id="resMargin">356 BDT</span>
+                    </div>
+                    <div class="pt-3 border-t border-slate-200 flex justify-between text-base font-bold text-pink-600">
+                        <span>Estimated Total (Excl. Local Delivery):</span>
+                        <span id="resTotal">4,456 BDT</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Payment Instructions Box -->
-            <div class="mt-6 p-4 bg-pink-50 rounded-xl border border-pink-100 text-xs text-slate-700 space-y-2">
-                <p class="font-semibold text-pink-700">📌 How to Order:</p>
+            <!-- Instructions & Payment Notice -->
+            <div class="p-4 bg-pink-50 rounded-xl border border-pink-100 text-xs text-slate-700 space-y-2">
+                <p class="font-semibold text-pink-700">📌 Order & Payment Instructions:</p>
                 <p>1. Send <b>50% Advance</b> via bKash / Nagad to confirm your order.</p>
-                <p>2. Local delivery charges via Steadfast Courier will be added when your package arrives in Bangladesh.</p>
+                <p>2. Fill out your details below along with your Transaction ID (TrxID) to submit your order instantly.</p>
+            </div>
+
+            <!-- Order Submission Form -->
+            <div class="pt-4 border-t border-slate-100">
+                <h3 class="text-sm font-semibold text-slate-900 mb-3">Submit Your Pre-Order Details</h3>
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Your Full Name</label>
+                        <input type="text" id="custName" placeholder="e.g., Nusrat Jahan" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Mobile Number (BD)</label>
+                        <input type="text" id="custPhone" placeholder="017xxxxxxxx" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Delivery Address (BD)</label>
+                        <textarea id="custAddress" rows="2" placeholder="House, Road, Area, District" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Payment Method</label>
+                            <select id="payMethod" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+                                <option value="bKash">bKash</option>
+                                <option value="Nagad">Nagad</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Transaction ID (TrxID)</label>
+                            <input type="text" id="trxId" placeholder="e.g., 9N74ABC..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <button onclick="submitOrder()" class="w-full bg-pink-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-pink-700 transition">Confirm & Send Order via WhatsApp</button>
+                </div>
             </div>
         </div>
+
+        <!-- Footer / Contact Details -->
+        <footer class="mt-12 pt-6 border-t border-slate-200 text-center text-xs text-slate-500 space-y-1">
+            <p class="font-bold text-slate-700 text-sm">K-Beliver's BD</p>
+            <p>Address: Belabo, Narsingdi, Bangladesh</p>
+            <p>Hotline BD: 01781571781, 01929063737</p>
+            <p>Korea WhatsApp: +82 010-9793-7655</p>
+        </footer>
     </div>
 
     <script>
@@ -136,6 +210,27 @@
 
             document.getElementById('resultBox').classList.remove('hidden');
         }
+
+        function submitOrder() {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const method = document.getElementById('payMethod').value;
+            const trx = document.getElementById('trxId').value.trim();
+            const total = document.getElementById('resTotal').innerText;
+            const platform = document.getElementById('resPlatform').innerText;
+            const link = document.getElementById('urlInput').value.trim();
+
+            if (!name || !phone || !address || !trx) {
+                alert('Please fill in all order details and your Transaction ID.');
+                return;
+            }
+
+            const message = `*New Order - K-Believer's BD*%0A%0A*Customer Name:* ${name}%0A*Phone:* ${phone}%0A*Address:* ${address}%0A%0A*Platform:* ${platform}%0A*Product Link:* ${link}%0A*Estimated Total:* ${total}%0A*Payment:* ${method}%0A*TrxID:* ${trx}`;
+            
+            window.open(`https://wa.me/message/4QK5LRQYL54RK1?text=${message}`, '_blank');
+        }
     </script>
 </body>
 </html>
+
