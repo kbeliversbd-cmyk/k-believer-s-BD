@@ -1,7 +1,6 @@
 import * as cheerio from 'cheerio';
 
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
@@ -13,8 +12,9 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
-        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Referer': 'https://www.google.com/'
       },
       redirect: 'follow'
     });
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     let price = null;
     let title = $('meta[property="og:title"]').attr('content') || $('title').text() || '';
 
-    // 1. Check JSON-LD structured data
+    // 1. Check JSON-LD structured data (Works for many sites)
     $('script[type="application/ld+json"]').each((_, elem) => {
       try {
         const json = JSON.parse($(elem).html());
@@ -40,25 +40,31 @@ export default async function handler(req, res) {
 
     // 2. Musinsa Specific Parsing
     if (!price && url.includes('musinsa')) {
-      const musinsaPrice = $('.product-numeric-price, .txt_price, .price, .product_price').first().text();
-      const cleaned = musinsaPrice.replace(/[^0-9]/g, '');
+      const pText = $('.product-numeric-price, .txt_price, .price, .product_price').first().text();
+      const cleaned = pText.replace(/[^0-9]/g, '');
       if (cleaned) price = parseFloat(cleaned);
     }
 
-    // 3. Olive Young Specific Parsing
+    // 3. Olive Young Specific Parsing (Mobile & Web)
     if (!price && url.includes('oliveyoung')) {
-      const oyPrice = $('#totalPrice, .price-2, .price_option .price, .prd_price .tx_cur').first().text();
-      const cleaned = oyPrice.replace(/[^0-9]/g, '');
+      const pText = $('#totalPrice, .price-2, .price_option .price, .prd_price .tx_cur, .tx_num').first().text();
+      const cleaned = pText.replace(/[^0-9]/g, '');
       if (cleaned) price = parseFloat(cleaned);
     }
 
     // 4. Zigzag Specific Parsing
     if (!price && url.includes('zigzag')) {
-      const metaPrice = $('meta[property="product:price:amount"]').attr('content');
-      if (metaPrice) price = parseFloat(metaPrice);
+      const metaPrice = $('meta[property="product:price:amount"]').attr('content') || $('meta[property="og:price:amount"]').attr('content');
+      if (metaPrice) {
+        price = parseFloat(metaPrice);
+      } else {
+        const pText = $('.css-1107wt4, .price, span[class*="price"]').first().text();
+        const cleaned = pText.replace(/[^0-9]/g, '');
+        if (cleaned) price = parseFloat(cleaned);
+      }
     }
 
-    // 5. Generic Fallback
+    // 5. General Fallback
     if (!price) {
       const metaPrice = $('meta[property="og:price:amount"]').attr('content');
       if (metaPrice) price = parseFloat(metaPrice);
